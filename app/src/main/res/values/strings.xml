@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Notella</string>
+    <string name="search">search notes</string>
+
 </resources>

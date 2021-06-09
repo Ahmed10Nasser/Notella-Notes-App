@@ -12,5 +12,17 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
+
+    </style>
+
+
+    <!-- Search theme. -->
+    <style name="ThemeOverlay.search" parent="Theme.Notella">
+
+        <!-- Customize your theme here. -->
+        <item name="android:editTextColor">@color/ColorWhite</item>
+        <item name="android:textColorHint">@color/ColorGray</item>
+
+
     </style>
 </resources>
