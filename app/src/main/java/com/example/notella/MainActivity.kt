@@ -11,10 +11,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        insertFragments(HomeFragment.newInstance(), true)
+        insertFragment(HomeFragment.newInstance(), true)
     }
 
-    private fun insertFragments(fragment: Fragment, is_transition: Boolean){
+    private fun insertFragment(fragment: Fragment, is_transition: Boolean){
         val fragmentTransaction = supportFragmentManager.beginTransaction()
         if (is_transition) {
             fragmentTransaction.setCustomAnimations(android.R.anim.slide_out_right, android.R.anim.slide_in_left)
