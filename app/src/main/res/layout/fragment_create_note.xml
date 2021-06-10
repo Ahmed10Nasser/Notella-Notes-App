@@ -32,7 +32,7 @@
         app:tint="@color/ColorWhite" />
     
     <EditText
-        android:id="@+id/etNoteTitle"
+        android:id="@+id/NoteTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="@dimen/_10sdp"
@@ -53,7 +53,7 @@
         />
 
     <TextView
-        android:id="@+id/tvDateTime"
+        android:id="@+id/DateTime"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/_5sdp"
@@ -61,7 +61,7 @@
         android:layout_marginBottom="@dimen/_5sdp"
         android:layout_marginStart="@dimen/_10sdp"
         android:layout_marginEnd="@dimen/_10sdp"
-        app:layout_constraintTop_toBottomOf="@id/etNoteTitle"
+        app:layout_constraintTop_toBottomOf="@id/NoteTitle"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:textColor="@color/ColorGray"
@@ -74,12 +74,12 @@
         />
 
     <LinearLayout
-        android:id="@+id/l1"
+        android:id="@+id/linearInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/_10sdp"
         android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/tvDateTime"
+        app:layout_constraintTop_toBottomOf="@id/DateTime"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
@@ -90,7 +90,7 @@
             android:layout_marginStart="@dimen/_5sdp"
             android:background="@color/ColorBlue"/>
         <EditText
-            android:id="@+id/etNoteSubTitle"
+            android:id="@+id/NoteSubTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="@dimen/_10sdp"
@@ -109,12 +109,12 @@
     </LinearLayout>
 
     <EditText
-        android:id="@+id/etNoteDesc"
+        android:id="@+id/NoteDesc"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="@dimen/_10sdp"
         android:layout_margin="@dimen/_10sdp"
-        app:layout_constraintTop_toBottomOf="@id/l1"
+        app:layout_constraintTop_toBottomOf="@id/linearInput"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:textColor="@color/ColorWhite"

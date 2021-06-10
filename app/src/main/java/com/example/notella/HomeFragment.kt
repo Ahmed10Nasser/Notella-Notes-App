@@ -6,6 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import kotlinx.android.synthetic.main.fragment_home.*
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentActivity
+
 
 
 class HomeFragment : BaseFragment() {
@@ -38,16 +41,17 @@ class HomeFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        fabBtnCreateNote.setOnClickListener{
-            replaceFragment(CreateFragment.newInstance(), true)
+        BtnCreateNote.setOnClickListener{
+            insertFragment(CreateFragment.newInstance(), true)
         }
     }
 
-    fun replaceFragment(fragment: Fragment, istransition:Boolean){
-        val fragmentTransition = activity!!.supportFragmentManager.beginTransaction()
-        if(istransition){
-            fragmentTransition.setCustomAnimations(android.R.anim.slide_out_right, android.R.anim.slide_in_left)
+    private fun insertFragment(fragment: Fragment, is_transition: Boolean){
+        val fragmentTransaction = (activity as FragmentActivity).supportFragmentManager.beginTransaction()
+        if (is_transition) {
+            fragmentTransaction.setCustomAnimations(android.R.anim.slide_out_right, android.R.anim.slide_in_left)
         }
-        fragmentTransition.replace(R.id.activity_fragment_container,fragment).addToBackStack(fragment.javaClass.simpleName)
+        fragmentTransaction.replace(R.id.activity_fragment_container, fragment).addToBackStack(fragment.javaClass.simpleName).commit()
+
     }
 }
