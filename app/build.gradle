@@ -58,5 +58,7 @@ dependencies {
     implementation 'com.makeramen:roundedimageview:2.3.0'
     implementation 'com.theartofdev.edmodo:android-image-cropper:2.8.0'
     implementation 'pub.devrel:easypermissions:3.0.0'
+
+    //coroutines core
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.1'
 }
