@@ -46,7 +46,7 @@
         app:layout_constraintTop_toBottomOf="@id/search_view" />
 
     <LinearLayout
-        android:id="@+id/l1"
+        android:id="@+id/layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
