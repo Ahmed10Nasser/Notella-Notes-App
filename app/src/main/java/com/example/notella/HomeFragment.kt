@@ -8,7 +8,10 @@ import android.view.ViewGroup
 import kotlinx.android.synthetic.main.fragment_home.*
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentActivity
-
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.example.notella.adapter.NotesAdapter
+import com.example.notella.database.NotesDatabase
+import kotlinx.coroutines.launch
 
 
 class HomeFragment : BaseFragment() {
@@ -41,6 +44,14 @@ class HomeFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        recycler_view.setHasFixedSize(true)
+        recycler_view.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL )
+        launch {
+            context?.let{
+                var notes = NotesDatabase.getDatabase(it).noteDao().getAll()
+                recycler_view.adapter = NotesAdapter(notes)
+            }
+        }
         BtnCreateNote.setOnClickListener{
             insertFragment(CreateFragment.newInstance(), true)
         }

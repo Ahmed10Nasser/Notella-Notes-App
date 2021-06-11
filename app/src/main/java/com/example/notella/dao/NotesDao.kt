@@ -6,7 +6,7 @@ import com.example.notella.entities.Notes
 @Dao
 interface NotesDao {
     @Query("SELECT * FROM notes ORDER BY id DESC")
-    fun getAll(): List<Notes>
+    suspend fun getAll(): List<Notes>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(note: Notes)
