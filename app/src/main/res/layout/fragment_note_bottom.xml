@@ -15,11 +15,11 @@
 
 
     <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_40sdp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/_40sdp">
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <ImageView
             android:id="@+id/more"

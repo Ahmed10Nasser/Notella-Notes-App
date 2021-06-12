@@ -13,6 +13,7 @@
     <style name="ThemeOverlay.search" parent="Theme.Notella">
         <!-- Customize your theme here. -->
         <item name="android:editTextColor">@color/ColorWhite</item>
-        <item name="android:textColorHint">@color/ColorGray</item>
+        <item name="android:textColorHint">@color/ColorText</item>
+        <item name="elevationOverlayColor">@color/colorOnSurface</item>
     </style>
 </resources>

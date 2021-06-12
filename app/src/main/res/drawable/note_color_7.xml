@@ -3,7 +3,6 @@
 
     <solid android:color="@color/ColorBlackNote"/>
     <corners android:radius="@dimen/_100sdp"/>
-    <stroke android:width="@dimen/_1sdp" android:color="@color/ColorDefaultNote"/>
 
 
 </shape>

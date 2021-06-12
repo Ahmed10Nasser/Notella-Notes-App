@@ -17,7 +17,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 
 class NoteBottomFragment : BottomSheetDialogFragment() {
 
-    var selectedColor = "#606570"
+    var selectedColor = "#ff606570"
 
     companion object{
         fun newInstance(): NoteBottomFragment{

@@ -31,7 +31,7 @@ class NotesAdapter(val notesList : List<Notes>) : RecyclerView.Adapter<NotesAdap
 
         if(notesList[position].color != null){
             holder.itemView.cardView.setCardBackgroundColor(Color.parseColor(notesList[position].color))
-            if (notesList[position].color !="#606570" && notesList[position].color != "#ff202734" ){
+            if (notesList[position].color !="#ff606570" && notesList[position].color != "#ff363636" ){
                 holder.itemView.Title.setTextColor(Color.parseColor("#10141C"))
                 holder.itemView.NoteText.setTextColor(Color.parseColor("#171C26"))
                 holder.itemView.DateTime.setTextColor(Color.parseColor("#171C26"))

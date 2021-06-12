@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimaryDark"
+    android:background="@color/colorPrimary"
     tools:context=".MainActivity">
 
     <ImageView
@@ -253,6 +253,7 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/_40sdp"
+        android:background="@color/colorOnSurface"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">

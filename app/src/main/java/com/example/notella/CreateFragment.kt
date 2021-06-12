@@ -31,7 +31,7 @@ import java.util.*
 
 class CreateFragment : BaseFragment() {
 
-    var selectedColor = "#606570"
+    var selectedColor = "#ff606570"
     var currentDate: String? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
