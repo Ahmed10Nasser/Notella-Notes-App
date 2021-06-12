@@ -25,11 +25,12 @@ import kotlinx.android.synthetic.main.fragment_note_bottom.*
 import kotlinx.android.synthetic.main.notes_item.*
 import kotlinx.android.synthetic.main.notes_item.view.*
 import kotlinx.coroutines.launch
+import pub.devrel.easypermissions.EasyPermissions
 import java.text.SimpleDateFormat
 import java.util.*
 
 
-class CreateFragment : BaseFragment() {
+class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, EasyPermissions.RationaleCallbacks {
 
     var selectedColor = "#ff606570"
     var currentDate: String? = null
@@ -62,7 +63,7 @@ class CreateFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(BroadcastReceiver, IntentFilter("color_action"))
+        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(BroadcastReceiver, IntentFilter("bottom_action"))
         colorView.setBackgroundColor(Color.parseColor(selectedColor))
 
         val sdf = SimpleDateFormat("dd/M/yyyy hh:mm:ss")
@@ -125,8 +126,17 @@ class CreateFragment : BaseFragment() {
 
     private val BroadcastReceiver : BroadcastReceiver = object : BroadcastReceiver(){
         override fun onReceive(context: Context?, intent: Intent?) {
-            selectedColor = intent!!.getStringExtra("selectedColor")!!
-            colorView.setBackgroundColor(Color.parseColor(selectedColor))
+            var actionNote = intent!!.getStringExtra("actionNote")!!
+
+            when(actionNote!!){
+                "Color"->{
+                    selectedColor = intent!!.getStringExtra("selectedColor")!!
+                    colorView.setBackgroundColor(Color.parseColor(selectedColor))
+                }
+                "Image"->{
+
+                }
+            }
         }
 
     }
@@ -134,6 +144,22 @@ class CreateFragment : BaseFragment() {
     override fun onDestroy() {
         LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(BroadcastReceiver)
         super.onDestroy()
+    }
+
+    override fun onPermissionsGranted(requestCode: Int, perms: MutableList<String>) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onPermissionsDenied(requestCode: Int, perms: MutableList<String>) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onRationaleAccepted(requestCode: Int) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onRationaleDenied(requestCode: Int) {
+        TODO("Not yet implemented")
     }
 
 }
