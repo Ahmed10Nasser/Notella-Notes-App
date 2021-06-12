@@ -1,7 +1,9 @@
 package com.example.notella.entities
 
+import android.net.Uri
 import androidx.room.*
 import java.io.Serializable
+import java.net.URI
 
 @Entity(tableName = "Notes")
 class Notes:Serializable {
@@ -16,7 +18,7 @@ class Notes:Serializable {
 
     @ColumnInfo(name = "date_time") var dateTime: String?=null
 
-    @ColumnInfo(name = "img_path") var imgPath: String?=null
+    @ColumnInfo(name = "img_uri") var imgUri: String?=null
 
     @ColumnInfo(name = "link") var link: String?=null
 

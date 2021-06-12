@@ -26,9 +26,9 @@
     <color name="ColorBlueNote">#84dfe2</color>
     <color name="ColorYellowNote">#ffffcc</color>
     <color name="ColorWhiteNote">#ffffff</color>
-    <color name="ColorPurpleNote">#a4ade9</color>
+    <color name="ColorPurpleNote">#d5b4fd</color>
     <color name="ColorGreenNote">#ccffcc</color>
     <color name="ColorOrangeNote">#ffc68a</color>
-    <color name="ColorDefaultNote">#ff606570</color>
-    <color name="ColorBlackNote">#ff363636</color>
+    <color name="ColorBlackNote">#ff606570</color>
+    <color name="ColorDefaultNote">#ff363636</color>
 </resources>

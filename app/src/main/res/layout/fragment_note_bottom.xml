@@ -151,6 +151,25 @@
                 app:tint="@color/ColorLightBlack"/>
         </FrameLayout>
         <FrameLayout
+            android:id="@+id/Note7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="@dimen/_5sdp">
+
+            <View
+                android:layout_width="@dimen/_24sdp"
+                android:layout_height="@dimen/_24sdp"
+                android:background="@drawable/note_color_7"/>
+
+            <ImageView
+                android:id="@+id/imgNote7"
+                android:layout_width="@dimen/_16sdp"
+                android:layout_height="@dimen/_16sdp"
+                android:layout_gravity="center"
+                app:tint="@color/ColorWhite"/>
+        </FrameLayout>
+
+        <FrameLayout
             android:id="@+id/NoteDefault"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -169,24 +188,6 @@
                 app:tint="@color/ColorWhite"/>
         </FrameLayout>
 
-        <FrameLayout
-            android:id="@+id/Note7"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingStart="@dimen/_5sdp">
-
-            <View
-                android:layout_width="@dimen/_24sdp"
-                android:layout_height="@dimen/_24sdp"
-                android:background="@drawable/note_color_7"/>
-
-            <ImageView
-                android:id="@+id/imgNote7"
-                android:layout_width="@dimen/_16sdp"
-                android:layout_height="@dimen/_16sdp"
-                android:layout_gravity="center"
-                app:tint="@color/ColorWhite"/>
-        </FrameLayout>
 
 
     </LinearLayout>
@@ -265,49 +266,6 @@
             app:layout_constraintEnd_toEndOf="parent"/>
 
     </LinearLayout>
-
-
-
-    <LinearLayout
-        android:id="@+id/layoutDelete"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
-        android:gravity="center"
-        android:layout_marginStart="@dimen/_10sdp"
-        android:layout_marginEnd="@dimen/_10sdp"
-        android:layout_marginBottom="@dimen/_10sdp"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_delete"
-            android:layout_marginStart="@dimen/_5sdp"
-            android:layout_marginEnd="@dimen/_10sdp"
-            app:tint="@color/ColorWhite" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/ColorWhite"
-            android:textSize="@dimen/_12ssp"
-            android:text="Delete Note"
-            android:fontFamily="@font/montserrat_regular"
-            android:maxLines="1"
-            android:ellipsize="end"
-            app:layout_constraintTop_toBottomOf="@id/NoteTitle"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
-
-    </LinearLayout>
-
-
-
 
 
 </LinearLayout>

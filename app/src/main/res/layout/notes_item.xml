@@ -22,13 +22,13 @@
             android:orientation="vertical">
 
             <com.makeramen.roundedimageview.RoundedImageView
-                android:id="@+id/imgNote"
+                android:id="@+id/imgRoundNote"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:riv_corner_radius_top_left="@dimen/_10sdp"
-                app:riv_corner_radius_top_right="@dimen/_10sdp"
                 android:adjustViewBounds="true"
-                android:visibility="gone"/>
+                android:visibility="gone"
+                app:riv_corner_radius_top_left="@dimen/_10sdp"
+                app:riv_corner_radius_top_right="@dimen/_10sdp"/>
 
             <TextView
                 android:id="@+id/Title"
@@ -66,7 +66,7 @@
                 android:textSize="@dimen/_11ssp"
                 android:text="@string/notes"
                 android:textColor="@color/ColorText"
-                android:fontFamily="@font/montserrat_bold"
+                android:fontFamily="@font/montserrat_regular"
                 android:paddingStart="@dimen/_10sdp"
                 android:paddingTop="@dimen/_5sdp"
                 android:paddingBottom="@dimen/_5sdp"
