@@ -53,9 +53,7 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-
-        }
+        noteId = requireArguments().getInt("noteId",-1)
     }
 
     override fun onCreateView(
@@ -79,6 +77,43 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+
+        if (noteId != -1){
+
+            launch {
+                context?.let {
+                    var notes = NotesDatabase.getDatabase(it).noteDao().getSpecificNote(noteId)
+                    colorView.setBackgroundColor(Color.parseColor(notes.color))
+                    NoteTitle.setText(notes.title)
+                    NoteSubTitle.setText(notes.sub_title)
+                    NoteText.setText(notes.text)
+                    if (notes.imgUri != ""){
+                        selectedImgUri = notes.imgUri!!
+                        imgNote.setImageBitmap(BitmapFactory.decodeFile(notes.imgUri))
+                        layoutImg.visibility = View.VISIBLE
+                        imgNote.visibility = View.VISIBLE
+                        imgDelete.visibility = View.VISIBLE
+                    }else{
+                        layoutImg.visibility = View.GONE
+                        imgNote.visibility = View.GONE
+                        imgDelete.visibility = View.GONE
+                    }
+
+                    if (notes.link != ""){
+                        webLink = notes.link!!
+                        tvWebLink.text = notes.link
+                        layoutWebUrl.visibility = View.VISIBLE
+                        etWebLink.setText(notes.link)
+                        imgDelete.visibility = View.VISIBLE
+                    }else{
+                        imgDelete.visibility = View.GONE
+                        layoutWebUrl.visibility = View.GONE
+                    }
+                }
+            }
+        }
+
 
         LocalBroadcastManager.getInstance(requireContext()).registerReceiver(BroadcastReceiver, IntentFilter("bottom_action"))
         colorView.setBackgroundColor(Color.parseColor(selectedColor))
@@ -147,9 +182,9 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
                     NoteText.setText("")
                     NoteTitle.setText("")
                     NoteSubTitle.setText("")
-                    tvWebLink.visibility=View.GONE
                     layoutInsertImage.visibility = View.GONE
                     imgNote.visibility = View.GONE
+                    tvWebLink.visibility=View.GONE
                     requireActivity().supportFragmentManager.popBackStack()
                 }
             }
