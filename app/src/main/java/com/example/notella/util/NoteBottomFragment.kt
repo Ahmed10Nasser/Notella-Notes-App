@@ -15,6 +15,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.example.notella.R
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import kotlinx.android.synthetic.main.fragment_create_note.*
 
 class NoteBottomFragment : BottomSheetDialogFragment() {
 
@@ -213,6 +214,11 @@ class NoteBottomFragment : BottomSheetDialogFragment() {
         layoutImg.setOnClickListener{
             val intent = Intent("bottom_action")
             intent.putExtra("actionNote", "Image")
+            LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(intent)
+        }
+        layoutWebUrl.setOnClickListener{
+            val intent = Intent("bottom_action")
+            intent.putExtra("actionNote", "WebUrl")
             LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(intent)
         }
     }

@@ -16,6 +16,7 @@ import kotlinx.coroutines.launch
 
 class HomeFragment : BaseFragment() {
 
+    var notesAdapter: NotesAdapter = NotesAdapter()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -49,12 +50,31 @@ class HomeFragment : BaseFragment() {
         launch {
             context?.let{
                 var notes = NotesDatabase.getDatabase(it).noteDao().getAll()
-                recycler_view.adapter = NotesAdapter(notes)
+                notesAdapter!!.setData(notes)
+                recycler_view.adapter = notesAdapter
             }
         }
+
+        notesAdapter!!.setOnClickListener(onClicked)
+
         BtnCreateNote.setOnClickListener{
             insertFragment(CreateFragment.newInstance(), true)
         }
+    }
+
+    private val onClicked = object :NotesAdapter.OnItemClickListener{
+        override fun onClicked(notesId: Int) {
+
+
+            var fragment :Fragment
+            var bundle = Bundle()
+            bundle.putInt("noteId",notesId)
+            fragment = CreateFragment.newInstance()
+            fragment.arguments = bundle
+
+            insertFragment(fragment,false)
+        }
+
     }
 
     private fun insertFragment(fragment: Fragment, is_transition: Boolean){
