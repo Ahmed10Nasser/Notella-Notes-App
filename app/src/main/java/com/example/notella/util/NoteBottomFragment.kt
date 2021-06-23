@@ -215,5 +215,10 @@ class NoteBottomFragment : BottomSheetDialogFragment() {
             intent.putExtra("actionNote", "Image")
             LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(intent)
         }
+        layoutWebUrl.setOnClickListener{
+            val intent = Intent("bottom_action")
+            intent.putExtra("actionNote", "WebUrl")
+            LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(intent)
+        }
     }
 }

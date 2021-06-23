@@ -12,6 +12,7 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Patterns
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 
@@ -36,6 +37,7 @@ import pub.devrel.easypermissions.EasyPermissions
 import java.net.URI
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.regex.Pattern
 
 
 class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, EasyPermissions.RationaleCallbacks {
@@ -45,6 +47,7 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
     private var READ_STORAGE_PERMISSION = 123
     private var IMAGE_REQUEST_CODE = 456
     private var selectedImgUri = ""
+    private var webLink = ""
     private var link = ""
     private var noteId = -1
 
@@ -98,6 +101,24 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
             noteBottomFragment.show(requireActivity().supportFragmentManager, "Note Bottom Fragment")
 
         }
+
+        btnOk.setOnClickListener{
+            if(etWebLink.text.toString().trim().isEmpty()){
+                checkWebUrl()
+            }else{
+                Toast.makeText(requireContext(),"Url is required", Toast.LENGTH_SHORT).show()
+
+            }
+        }
+
+        btnCancel.setOnClickListener{
+            layoutWebUrl.visibility=View.GONE
+        }
+
+        tvWebLink.setOnClickListener{
+            var intent=Intent(Intent.ACTION_VIEW, Uri.parse(etWebLink.text.toString()))
+            startActivity(intent)
+        }
     }
 
     private fun saveNote() {
@@ -120,12 +141,13 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
                 notes.dateTime = currentDate
                 notes.color = selectedColor
                 notes.imgUri = selectedImgUri
-
+                notes.link=webLink
                 context?.let {
                     NotesDatabase.getDatabase(it).noteDao().insert(notes)
                     NoteText.setText("")
                     NoteTitle.setText("")
                     NoteSubTitle.setText("")
+                    tvWebLink.visibility=View.GONE
                     layoutInsertImage.visibility = View.GONE
                     imgNote.visibility = View.GONE
                     requireActivity().supportFragmentManager.popBackStack()
@@ -143,6 +165,20 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
 
     }
 
+
+    private fun checkWebUrl(){
+        if(Patterns.WEB_URL.matcher(etWebLink.text.toString()).matches()){
+            layoutWebUrl.visibility=View.GONE
+            etWebLink.isEnabled=false
+            webLink=etWebLink.text.toString()
+            tvWebLink.visibility=View.VISIBLE
+            tvWebLink.text=etWebLink.text.toString()
+        }else{
+            Toast.makeText(requireContext(),"Url is not valid", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+
     private val BroadcastReceiver : BroadcastReceiver = object : BroadcastReceiver(){
         override fun onReceive(context: Context?, intent: Intent?) {
             var actionNote = intent!!.getStringExtra("actionNote")!!
@@ -154,9 +190,14 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
                 }
                 "Image"->{
                     readStorageTask()
+                    layoutWebUrl.visibility = View.GONE
+                }
+                "WebUrl"->{
+                    layoutWebUrl.visibility = View.VISIBLE
                 }
                 else -> {
                     layoutInsertImage.visibility = View.GONE
+                    layoutWebUrl.visibility = View.GONE
                     imgNote.visibility = View.GONE
                     layoutInsertLink.visibility = View.GONE
                     selectedColor = intent!!.getStringExtra("selectedColor")!!
