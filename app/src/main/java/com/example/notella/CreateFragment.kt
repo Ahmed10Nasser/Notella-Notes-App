@@ -106,7 +106,9 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
                         layoutWebUrl.visibility = View.VISIBLE
                         etWebLink.setText(notes.link)
                         imgDelete.visibility = View.VISIBLE
+                        imgUrlDelete.visibility=View.VISIBLE
                     }else{
+                        imgUrlDelete.visibility=View.GONE
                         imgDelete.visibility = View.GONE
                         layoutWebUrl.visibility = View.GONE
                     }
@@ -123,8 +125,11 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
         DateTime.text = currentDate
 
         imgDone.setOnClickListener {
-            // Save Note
-            saveNote()
+            if (noteId != -1){
+                updateNote()
+            }else{
+                saveNote()
+            }
         }
 
         imgBack.setOnClickListener {
@@ -134,6 +139,12 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
         imgMore.setOnClickListener {
             var noteBottomFragment = NoteBottomFragment.newInstance()
             noteBottomFragment.show(requireActivity().supportFragmentManager, "Note Bottom Fragment")
+
+        }
+
+        imgDelete.setOnClickListener {
+            selectedImgUri = ""
+            layoutImage.visibility = View.GONE
 
         }
 
@@ -147,7 +158,19 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
         }
 
         btnCancel.setOnClickListener{
-            layoutWebUrl.visibility=View.GONE
+            if (noteId != -1){
+                tvWebLink.visibility = View.VISIBLE
+                layoutWebUrl.visibility = View.GONE
+            }else{
+                layoutWebUrl.visibility = View.GONE
+            }
+        }
+
+        imgUrlDelete.setOnClickListener {
+            webLink = ""
+            tvWebLink.visibility = View.GONE
+            imgUrlDelete.visibility = View.GONE
+            layoutWebUrl.visibility = View.GONE
         }
 
         tvWebLink.setOnClickListener{
@@ -155,6 +178,35 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
             startActivity(intent)
         }
     }
+
+
+    private fun updateNote(){
+        launch {
+
+            context?.let {
+                var notes = NotesDatabase.getDatabase(it).noteDao().getSpecificNote(noteId)
+
+                notes.title = NoteTitle.text.toString()
+                notes.sub_title = NoteSubTitle.text.toString()
+                notes.text = NoteText.text.toString()
+                notes.dateTime = currentDate
+                notes.color = selectedColor
+                notes.imgUri = selectedImgUri
+                notes.link = webLink
+
+                NotesDatabase.getDatabase(it).noteDao().updateNote(notes)
+                NoteTitle.setText("")
+                NoteSubTitle.setText("")
+                NoteText.setText("")
+                layoutImage.visibility = View.GONE
+                imgNote.visibility = View.GONE
+                tvWebLink.visibility = View.GONE
+                requireActivity().supportFragmentManager.popBackStack()
+            }
+        }
+    }
+
+
 
     private fun saveNote() {
         if (NoteTitle.text.isNullOrEmpty()) {
@@ -182,7 +234,7 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
                     NoteText.setText("")
                     NoteTitle.setText("")
                     NoteSubTitle.setText("")
-                    layoutInsertImage.visibility = View.GONE
+                    layoutImage.visibility = View.GONE
                     imgNote.visibility = View.GONE
                     tvWebLink.visibility=View.GONE
                     requireActivity().supportFragmentManager.popBackStack()
@@ -231,7 +283,7 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
                     layoutWebUrl.visibility = View.VISIBLE
                 }
                 else -> {
-                    layoutInsertImage.visibility = View.GONE
+                    layoutImage.visibility = View.GONE
                     layoutWebUrl.visibility = View.GONE
                     imgNote.visibility = View.GONE
                     layoutInsertLink.visibility = View.GONE
@@ -296,7 +348,7 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
                         var bitmap = BitmapFactory.decodeStream(inputStream)
                         imgNote.setImageBitmap(bitmap)
                         imgNote.visibility = View.VISIBLE
-                        layoutInsertImage.visibility = View.VISIBLE
+                        layoutImage.visibility = View.VISIBLE
                         selectedImgUri = selectedImageUrl.toString()
 
                     }catch (e:Exception){
