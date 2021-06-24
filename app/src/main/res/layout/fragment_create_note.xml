@@ -137,7 +137,7 @@
     </RelativeLayout>
 
     <LinearLayout
-        android:id="@+id/layoutInsertLink"
+        android:id="@+id/layoutInsertWebUrl"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
@@ -155,7 +155,7 @@
             android:gravity="center"
             android:orientation="horizontal">
             <EditText
-                android:id="@+id/Link"
+                android:id="@+id/etWebLink"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -169,7 +169,7 @@
                 android:textColorHint="@color/ColorGray"
                 android:textSize="@dimen/_12ssp" />
             <ImageView
-                android:id="@+id/UrlDelete"
+                android:id="@+id/imgUrlDelete"
                 android:layout_width="@dimen/_24sdp"
                 android:layout_height="@dimen/_24sdp"
                 android:visibility="gone"
@@ -213,7 +213,7 @@
     </LinearLayout>
 
     <TextView
-        android:id="@+id/LinkText"
+        android:id="@+id/tvWebLink"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/_10sdp"
@@ -230,7 +230,7 @@
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/layoutInsertLink" />
+        app:layout_constraintTop_toBottomOf="@id/layoutInsertWebUrl" />
 
     <EditText
         android:id="@+id/NoteText"
@@ -247,7 +247,7 @@
         android:textSize="@dimen/_12ssp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/LinkText" />
+        app:layout_constraintTop_toBottomOf="@id/tvWebLink" />
 
 
     <FrameLayout

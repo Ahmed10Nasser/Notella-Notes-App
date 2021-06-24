@@ -52,6 +52,13 @@ class NotesAdapter(val notesList: List<Notes>) : RecyclerView.Adapter<NotesAdapt
         }else{
             holder.itemView.imgRoundNote.visibility = View.GONE
         }
+
+        if (notesList[position].link != ""){
+            holder.itemView.Link.text = notesList[position].link
+            holder.itemView.Link.visibility = View.VISIBLE
+        }else{
+            holder.itemView.Link.visibility = View.GONE
+        }
     }
 
     override fun getItemCount(): Int {
