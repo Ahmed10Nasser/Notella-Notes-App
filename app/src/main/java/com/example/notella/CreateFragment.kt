@@ -51,9 +51,7 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-
-        }
+        noteId = requireArguments().getInt("noteId",-1)
     }
 
     override fun onCreateView(
@@ -77,6 +75,33 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+
+        if (noteId != -1){
+
+            launch {
+                context?.let {
+                    var notes = NotesDatabase.getDatabase(it).noteDao().getSpecificNote(noteId)
+                    colorView.setBackgroundColor(Color.parseColor(notes.color))
+                    NoteTitle.setText(notes.title)
+                    NoteSubTitle.setText(notes.sub_title)
+                    NoteText.setText(notes.text)
+                    if (notes.imgUri != ""){
+                        imgNote.setImageBitmap(BitmapFactory.decodeFile(notes.imgUri))
+                        imgNote.visibility = View.VISIBLE
+                    }else{
+                        imgNote.visibility = View.GONE
+                    }
+
+                    if (notes.link != ""){
+                        tvWebLink.text = notes.link
+                        tvWebLink.visibility=View.VISIBLE
+                    }else{
+                        tvWebLink.visibility=View.GONE
+                    }
+                }
+            }
+        }
 
         LocalBroadcastManager.getInstance(requireContext()).registerReceiver(BroadcastReceiver, IntentFilter("bottom_action"))
         colorView.setBackgroundColor(Color.parseColor(selectedColor))
