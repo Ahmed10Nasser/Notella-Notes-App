@@ -11,11 +11,13 @@ import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.notella.adapter.NotesAdapter
 import com.example.notella.database.NotesDatabase
+import com.example.notella.entities.Notes
 import kotlinx.coroutines.launch
 
 
 class HomeFragment : BaseFragment() {
-
+    var arrNotes = ArrayList<Notes>()
+    var notesAdapter: NotesAdapter = NotesAdapter()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -49,12 +51,32 @@ class HomeFragment : BaseFragment() {
         launch {
             context?.let{
                 var notes = NotesDatabase.getDatabase(it).noteDao().getAll()
-                recycler_view.adapter = NotesAdapter(notes)
+                notesAdapter!!.setData(notes)
+                arrNotes = notes as ArrayList<Notes>
+                recycler_view.adapter = notesAdapter
             }
         }
+
+        notesAdapter!!.setOnClickListener(onClicked)
+
         BtnCreateNote.setOnClickListener{
             insertFragment(CreateFragment.newInstance(), true)
         }
+    }
+
+    private val onClicked = object :NotesAdapter.OnItemClickListener{
+        override fun onClicked(notesId: Int) {
+
+
+            var fragment :Fragment
+            var bundle = Bundle()
+            bundle.putInt("noteId",notesId)
+            fragment = CreateFragment.newInstance()
+            fragment.arguments = bundle
+
+            insertFragment(fragment,false)
+        }
+
     }
 
     private fun insertFragment(fragment: Fragment, is_transition: Boolean){
@@ -65,4 +87,6 @@ class HomeFragment : BaseFragment() {
         fragmentTransaction.replace(R.id.activity_fragment_container, fragment).addToBackStack(fragment.javaClass.simpleName).commit()
 
     }
+
+
 }

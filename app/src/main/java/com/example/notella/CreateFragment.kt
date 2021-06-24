@@ -12,6 +12,7 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Patterns
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 
@@ -50,9 +51,7 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-
-        }
+        noteId = requireArguments().getInt("noteId",-1)
     }
 
     override fun onCreateView(
@@ -77,6 +76,43 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
+        if (noteId != -1){
+
+            launch {
+                context?.let {
+                    var notes = NotesDatabase.getDatabase(it).noteDao().getSpecificNote(noteId)
+                    colorView.setBackgroundColor(Color.parseColor(notes.color))
+                    NoteTitle.setText(notes.title)
+                    NoteSubTitle.setText(notes.sub_title)
+                    NoteText.setText(notes.text)
+                    if (notes.imgUri != ""){
+                        selectedImgUri=notes.imgUri!!
+                        imgNote.setImageBitmap(BitmapFactory.decodeFile(notes.imgUri))
+                        imgNote.visibility = View.VISIBLE
+                        imgDelete.visibility = View.VISIBLE
+                        layoutInsertImage.visibility=View.VISIBLE
+                    }else{
+                        imgNote.visibility = View.GONE
+                        imgDelete.visibility = View.GONE
+                        layoutInsertImage.visibility=View.GONE
+                    }
+
+
+                    if (notes.link != ""){
+                        link=notes.link!!
+                        tvWebLink.text = notes.link
+                        layoutInsertWebUrl.visibility=View.VISIBLE
+                        imgUrlDelete.visibility=View.VISIBLE
+                        etWebLink.setText(notes.link)
+                    }else{
+                        imgUrlDelete.visibility=View.GONE
+                        layoutInsertWebUrl.visibility=View.GONE
+                    }
+                }
+            }
+        }
+
         LocalBroadcastManager.getInstance(requireContext()).registerReceiver(BroadcastReceiver, IntentFilter("bottom_action"))
         colorView.setBackgroundColor(Color.parseColor(selectedColor))
 
@@ -85,8 +121,11 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
         DateTime.text = currentDate
 
         imgDone.setOnClickListener {
-            // Save Note
-            saveNote()
+            if (noteId != -1){
+                updateNote()
+            }else{
+                saveNote()
+            }
         }
 
         imgBack.setOnClickListener {
@@ -97,6 +136,70 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
             var noteBottomFragment = NoteBottomFragment.newInstance()
             noteBottomFragment.show(requireActivity().supportFragmentManager, "Note Bottom Fragment")
 
+        }
+
+        imgDelete.setOnClickListener {
+            selectedImgUri = ""
+            layoutInsertImage.visibility = View.GONE
+
+        }
+
+        btnOk.setOnClickListener {
+            if (etWebLink.text.toString().trim().isNotEmpty()){
+                checkWebUrl()
+            }else{
+                Toast.makeText(requireContext(),"Url is Required",Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        btnCancel.setOnClickListener {
+            if (noteId != -1){
+                tvWebLink.visibility = View.VISIBLE
+                layoutInsertWebUrl.visibility = View.GONE
+            }else{
+                layoutInsertWebUrl.visibility = View.GONE
+            }
+
+        }
+
+        imgUrlDelete.setOnClickListener {
+            link = ""
+            tvWebLink.visibility = View.GONE
+            imgUrlDelete.visibility = View.GONE
+            layoutInsertWebUrl.visibility = View.GONE
+        }
+
+        tvWebLink.setOnClickListener {
+            var intent = Intent(Intent.ACTION_VIEW,Uri.parse(etWebLink.text.toString()))
+            startActivity(intent)
+        }
+    }
+
+
+
+    private fun updateNote(){
+        launch {
+
+            context?.let {
+                var notes = NotesDatabase.getDatabase(it).noteDao().getSpecificNote(noteId)
+
+                notes.title = NoteTitle.text.toString()
+                notes.sub_title = NoteSubTitle.text.toString()
+                notes.text = NoteText.text.toString()
+                notes.dateTime = currentDate
+                notes.color = selectedColor
+                notes.imgUri = selectedImgUri
+                notes.link = link
+
+                NotesDatabase.getDatabase(it).noteDao().updateNote(notes)
+                NoteTitle.setText("")
+                NoteSubTitle.setText("")
+                NoteText.setText("")
+                layoutInsertImage.visibility = View.GONE
+                imgNote.visibility = View.GONE
+                tvWebLink.visibility = View.GONE
+                requireActivity().supportFragmentManager.popBackStack()
+            }
         }
     }
 
@@ -120,7 +223,7 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
                 notes.dateTime = currentDate
                 notes.color = selectedColor
                 notes.imgUri = selectedImgUri
-
+                notes.link=link
                 context?.let {
                     NotesDatabase.getDatabase(it).noteDao().insert(notes)
                     NoteText.setText("")
@@ -128,19 +231,23 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
                     NoteSubTitle.setText("")
                     layoutInsertImage.visibility = View.GONE
                     imgNote.visibility = View.GONE
+                    tvWebLink.visibility=View.GONE
                     requireActivity().supportFragmentManager.popBackStack()
                 }
             }
         }
     }
 
-    private fun insertFragment(fragment: Fragment, is_transition: Boolean) {
-        val fragmentTransaction = (activity as FragmentActivity).supportFragmentManager.beginTransaction()
-        if (is_transition) {
-            fragmentTransaction.setCustomAnimations(android.R.anim.slide_out_right, android.R.anim.slide_in_left)
+    private fun checkWebUrl(){
+        if (Patterns.WEB_URL.matcher(etWebLink.text.toString()).matches()){
+            layoutInsertWebUrl.visibility = View.GONE
+            etWebLink.isEnabled = false
+            link = etWebLink.text.toString()
+            tvWebLink.visibility = View.VISIBLE
+            tvWebLink.text = etWebLink.text.toString()
+        }else{
+            Toast.makeText(requireContext(),"Url is not valid",Toast.LENGTH_SHORT).show()
         }
-        fragmentTransaction.replace(R.id.activity_fragment_container, fragment).addToBackStack(fragment.javaClass.simpleName).commit()
-
     }
 
     private val BroadcastReceiver : BroadcastReceiver = object : BroadcastReceiver(){
@@ -154,11 +261,15 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
                 }
                 "Image"->{
                     readStorageTask()
+                    layoutInsertWebUrl.visibility=View.GONE
+                }
+                "WebUrl"->{
+                    layoutInsertWebUrl.visibility=View.VISIBLE
                 }
                 else -> {
                     layoutInsertImage.visibility = View.GONE
                     imgNote.visibility = View.GONE
-                    layoutInsertLink.visibility = View.GONE
+                    layoutInsertWebUrl.visibility = View.GONE
                     selectedColor = intent!!.getStringExtra("selectedColor")!!
                     colorView.setBackgroundColor(Color.parseColor(selectedColor))
 
