@@ -14,9 +14,8 @@ import kotlinx.android.synthetic.main.notes_item.view.*
 
 
 
-class NotesAdapter() : RecyclerView.Adapter<NotesAdapter.NotesViewHolder>() {
-    var listener:OnItemClickListener? = null
-    var notesList= ArrayList<Notes>()
+class NotesAdapter(val notesList: List<Notes>) : RecyclerView.Adapter<NotesAdapter.NotesViewHolder>() {
+
     class NotesViewHolder(view: View) : RecyclerView.ViewHolder(view){
 
     }
@@ -25,14 +24,6 @@ class NotesAdapter() : RecyclerView.Adapter<NotesAdapter.NotesViewHolder>() {
         return  NotesViewHolder(
             LayoutInflater.from(parent.context).inflate(R.layout.notes_item, parent, false)
         )
-    }
-
-    fun setData(notesArrList: List<Notes>){
-        notesList = notesArrList as ArrayList<Notes>
-    }
-
-    fun setOnClickListener(listener1: OnItemClickListener){
-        listener = listener1
     }
 
     override fun onBindViewHolder(holder: NotesViewHolder, position: Int) {
@@ -61,27 +52,9 @@ class NotesAdapter() : RecyclerView.Adapter<NotesAdapter.NotesViewHolder>() {
         }else{
             holder.itemView.imgRoundNote.visibility = View.GONE
         }
-
-        if (notesList[position].link != null){
-
-            holder.itemView.WebLink.text=notesList[position].link
-            holder.itemView.WebLink.visibility = View.VISIBLE
-
-
-        }else{
-            holder.itemView.imgRoundNote.visibility = View.GONE
-        }
-
-        holder.itemView.cardView.setOnClickListener {
-            listener!!.onClicked(notesList[position].id!!)
-        }
     }
 
     override fun getItemCount(): Int {
         return notesList.size
-    }
-
-    interface OnItemClickListener{
-        fun onClicked(noteId:Int)
     }
 }

@@ -230,7 +230,7 @@
 
 
     <LinearLayout
-        android:id="@+id/layoutWebLink"
+        android:id="@+id/layoutLink"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
