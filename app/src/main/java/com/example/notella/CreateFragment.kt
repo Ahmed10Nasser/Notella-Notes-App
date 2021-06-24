@@ -87,17 +87,27 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
                     NoteSubTitle.setText(notes.sub_title)
                     NoteText.setText(notes.text)
                     if (notes.imgUri != ""){
+                        selectedImgUri=notes.imgUri!!
                         imgNote.setImageBitmap(BitmapFactory.decodeFile(notes.imgUri))
                         imgNote.visibility = View.VISIBLE
+                        imgDelete.visibility = View.VISIBLE
+                        layoutInsertImage.visibility=View.VISIBLE
                     }else{
                         imgNote.visibility = View.GONE
+                        imgDelete.visibility = View.GONE
+                        layoutInsertImage.visibility=View.GONE
                     }
 
+
                     if (notes.link != ""){
+                        link=notes.link!!
                         tvWebLink.text = notes.link
-                        tvWebLink.visibility=View.VISIBLE
+                        layoutInsertWebUrl.visibility=View.VISIBLE
+                        imgUrlDelete.visibility=View.VISIBLE
+                        etWebLink.setText(notes.link)
                     }else{
-                        tvWebLink.visibility=View.GONE
+                        imgUrlDelete.visibility=View.GONE
+                        layoutInsertWebUrl.visibility=View.GONE
                     }
                 }
             }
@@ -111,8 +121,11 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
         DateTime.text = currentDate
 
         imgDone.setOnClickListener {
-            // Save Note
-            saveNote()
+            if (noteId != -1){
+                updateNote()
+            }else{
+                saveNote()
+            }
         }
 
         imgBack.setOnClickListener {
@@ -122,6 +135,12 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
         imgMore.setOnClickListener {
             var noteBottomFragment = NoteBottomFragment.newInstance()
             noteBottomFragment.show(requireActivity().supportFragmentManager, "Note Bottom Fragment")
+
+        }
+
+        imgDelete.setOnClickListener {
+            selectedImgUri = ""
+            layoutInsertImage.visibility = View.GONE
 
         }
 
@@ -143,9 +162,44 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
 
         }
 
+        imgUrlDelete.setOnClickListener {
+            link = ""
+            tvWebLink.visibility = View.GONE
+            imgUrlDelete.visibility = View.GONE
+            layoutInsertWebUrl.visibility = View.GONE
+        }
+
         tvWebLink.setOnClickListener {
             var intent = Intent(Intent.ACTION_VIEW,Uri.parse(etWebLink.text.toString()))
             startActivity(intent)
+        }
+    }
+
+
+
+    private fun updateNote(){
+        launch {
+
+            context?.let {
+                var notes = NotesDatabase.getDatabase(it).noteDao().getSpecificNote(noteId)
+
+                notes.title = NoteTitle.text.toString()
+                notes.sub_title = NoteSubTitle.text.toString()
+                notes.text = NoteText.text.toString()
+                notes.dateTime = currentDate
+                notes.color = selectedColor
+                notes.imgUri = selectedImgUri
+                notes.link = link
+
+                NotesDatabase.getDatabase(it).noteDao().updateNote(notes)
+                NoteTitle.setText("")
+                NoteSubTitle.setText("")
+                NoteText.setText("")
+                layoutInsertImage.visibility = View.GONE
+                imgNote.visibility = View.GONE
+                tvWebLink.visibility = View.GONE
+                requireActivity().supportFragmentManager.popBackStack()
+            }
         }
     }
 
