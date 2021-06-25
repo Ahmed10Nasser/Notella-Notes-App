@@ -22,28 +22,23 @@ class NotesAdapter() : RecyclerView.Adapter<NotesAdapter.NotesViewHolder>() {
     class NotesViewHolder(view: View) : RecyclerView.ViewHolder(view){
 
     }
-
+    // RecyclerView calls this method whenever it needs to create a new ViewHolder
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NotesViewHolder {
         return  NotesViewHolder(
             LayoutInflater.from(parent.context).inflate(R.layout.notes_item, parent, false)
         )
     }
-
-    fun setData(arrNotesList: List<Notes>){
-        notesList = arrNotesList as ArrayList<Notes>
-    }
-
-    fun setOnClickListener(listener1:OnItemClickListener){
-        listener = listener1
-    }
-
+    //RecyclerView calls this method to associate a ViewHolder with data.
     override fun onBindViewHolder(holder: NotesViewHolder, position: Int) {
+        //view note text
         holder.itemView.Title.text = notesList[position].title
         holder.itemView.NoteText.text = notesList[position].text
         holder.itemView.DateTime.text = notesList[position].dateTime
 
+        //view note color
         if(notesList[position].color != null){
             holder.itemView.cardView.setCardBackgroundColor(Color.parseColor(notesList[position].color))
+            //light text color for darker notes
             if (notesList[position].color !="#ff606570" && notesList[position].color != "#ff363636" ){
                 holder.itemView.Title.setTextColor(Color.parseColor("#10141C"))
                 holder.itemView.NoteText.setTextColor(Color.parseColor("#171C26"))
@@ -52,7 +47,7 @@ class NotesAdapter() : RecyclerView.Adapter<NotesAdapter.NotesViewHolder>() {
         }else{
             holder.itemView.cardView.setCardBackgroundColor(Color.parseColor(R.color.ColorDefaultNote.toString()))
         }
-
+        //view note image
         if (notesList[position].imgUri != null){
 
             val uri = Uri.parse(notesList[position].imgUri)
@@ -63,7 +58,7 @@ class NotesAdapter() : RecyclerView.Adapter<NotesAdapter.NotesViewHolder>() {
         }else{
             holder.itemView.imgRoundNote.visibility = View.GONE
         }
-
+        //view note link
         if (notesList[position].link != ""){
             holder.itemView.Link.text = notesList[position].link
             holder.itemView.Link.visibility = View.VISIBLE
@@ -71,16 +66,30 @@ class NotesAdapter() : RecyclerView.Adapter<NotesAdapter.NotesViewHolder>() {
             holder.itemView.Link.visibility = View.GONE
         }
 
+        //listener for a click on a note
         holder.itemView.cardView.setOnClickListener {
             listener!!.onClicked(notesList[position].id!!)
         }
     }
 
+    // RecyclerView calls this method to get the size of the data set.
     override fun getItemCount(): Int {
         return notesList.size
+    }
+
+    fun setData(arrNotesList: List<Notes>){
+        notesList = arrNotesList as ArrayList<Notes>
     }
 
     interface OnItemClickListener{
         fun onClicked(noteId:Int)
     }
+
+    fun setOnClickListener(clickListener:OnItemClickListener){
+        listener = clickListener
+    }
+
+
+
+
 }

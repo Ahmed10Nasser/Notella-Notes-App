@@ -34,7 +34,7 @@ import java.util.*
 
 
 class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, EasyPermissions.RationaleCallbacks {
-
+    //initial variables
     var selectedColor = "#ff363636"
     var currentDate: String? = null
     private var READ_STORAGE_PERMISSION = 123
@@ -42,6 +42,7 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
     private var selectedImgUri = ""
     private var link = ""
     private var noteId = -1
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,19 +69,20 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-
+        // If note is being updated
         if (noteId != -1){
 
             launch {
                 context?.let {
-                    var notes = NotesDatabase.getDatabase(it).noteDao().getNote(noteId)
-                    colorView.setBackgroundColor(Color.parseColor(notes.color))
-                    NoteTitle.setText(notes.title)
-                    NoteText.setText(notes.text)
-                    if (notes.imgUri != ""){
-                        val selectedImgUri= Uri.parse(notes.imgUri)!!
-                        imgNote.setImageURI(selectedImgUri)
+                    var note = NotesDatabase.getDatabase(it).noteDao().getNote(noteId)
+                    selectedColor = note.color!!
+                    colorView.setBackgroundColor(Color.parseColor(note.color))
+                    NoteTitle.setText(note.title)
+                    NoteText.setText(note.text)
+                    if (note.imgUri != ""){
+                        selectedImgUri= note.imgUri.toString()
+                        val imgUri= Uri.parse(note.imgUri)!!
+                        imgNote.setImageURI(imgUri)
                         imgNote.visibility = View.VISIBLE
                         imgDelete.visibility = View.VISIBLE
                         layoutInsertImage.visibility=View.VISIBLE
@@ -91,12 +93,12 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
                     }
 
 
-                    if (notes.link != ""){
-                        link=notes.link!!
-                        WebLink.text = notes.link
+                    if (note.link != ""){
+                        link=note.link!!
+                        WebLink.text = note.link
                         layoutInsertWebUrl.visibility=View.VISIBLE
                         imgUrlDelete.visibility=View.VISIBLE
-                        WebLinkText.setText(notes.link)
+                        WebLinkText.setText(note.link)
                     }else{
                         imgUrlDelete.visibility=View.GONE
                         layoutInsertWebUrl.visibility=View.GONE
@@ -105,13 +107,17 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
             }
         }
 
-        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(BroadcastReceiver, IntentFilter("bottom_action"))
-        colorView.setBackgroundColor(Color.parseColor(selectedColor))
 
-        val sdf_now = SimpleDateFormat("dd/M/yyyy hh:mm:ss")
-        currentDate = sdf_now.format(Date())
+
+        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(BroadcastReceiver, IntentFilter("bottom_action"))
+
+        // Add initial color and current date
+        colorView.setBackgroundColor(Color.parseColor(selectedColor))
+        val now = SimpleDateFormat("dd/M/yyyy hh:mm:ss")
+        currentDate = now.format(Date())
         DateTime.text = currentDate
 
+        // save created note or update current note (based on Id)
         imgDone.setOnClickListener {
             if (noteId != -1){
                 updateNote()
@@ -120,22 +126,25 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
             }
         }
 
+        // Go to Home
         imgBack.setOnClickListener {
             requireActivity().supportFragmentManager.popBackStack()
         }
 
+        // Shoe note options menu
         imgMore.setOnClickListener {
             var noteBottomFragment = NoteBottomFragment.newInstance(noteId)
             noteBottomFragment.show(requireActivity().supportFragmentManager, "Note Bottom Fragment")
 
         }
 
+        // Delete Image
         imgDelete.setOnClickListener {
             selectedImgUri = ""
             layoutInsertImage.visibility = View.GONE
-
         }
 
+        // Add Web Link
         LinkOkBtn.setOnClickListener {
             if (WebLinkText.text.toString().trim().isNotEmpty()){
                 ValidateUrl()
@@ -144,6 +153,7 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
             }
         }
 
+        //Cancel Web Link
         LinkCancelBtn.setOnClickListener {
             if (noteId != -1){
                 WebLink.visibility = View.VISIBLE
@@ -154,6 +164,7 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
 
         }
 
+        //Delete Web LInk
         imgUrlDelete.setOnClickListener {
             link = ""
             WebLink.visibility = View.GONE
@@ -161,6 +172,7 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
             layoutInsertWebUrl.visibility = View.GONE
         }
 
+        //Follow Web Link
         WebLink.setOnClickListener {
             var intent = Intent(Intent.ACTION_VIEW,Uri.parse(WebLinkText.text.toString()))
             startActivity(intent)
@@ -220,20 +232,24 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
         }
     }
 
+    private fun discardBottomFragment(){
+        val manager: FragmentManager = requireActivity().supportFragmentManager
+        val f: Fragment? = manager.findFragmentByTag("Note Bottom Fragment")
+        val trans: FragmentTransaction = manager.beginTransaction()
+        if (f != null) {
+            trans.remove(f)
+        }
+        trans.commit()
+    }
+
     //function to delete a note
     private fun deleteNote(){
 
         launch {
             context?.let {
                 NotesDatabase.getDatabase(it).noteDao().deleteNote(noteId)
-                val manager: FragmentManager = requireActivity().supportFragmentManager
-                val f: Fragment? = manager.findFragmentByTag("Note Bottom Fragment")
-                val trans: FragmentTransaction = manager.beginTransaction()
-                if (f != null) {
-                    trans.remove(f)
-                }
-                trans.commit()
-                manager.popBackStack()
+                discardBottomFragment()
+                requireActivity().supportFragmentManager.popBackStack()
             }
         }
     }
@@ -267,6 +283,7 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
                 }
                 "WebLink"->{
                     layoutInsertWebUrl.visibility=View.VISIBLE
+                    discardBottomFragment()
                 }
                 "DeleteNote" -> {
                     deleteNote()
