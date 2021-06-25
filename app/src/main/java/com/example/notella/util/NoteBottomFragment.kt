@@ -21,10 +21,12 @@ class NoteBottomFragment : BottomSheetDialogFragment() {
     var selectedColor = "#ff363636"
 
     companion object{
-        fun newInstance(): NoteBottomFragment{
+        var noteId = -1
+        fun newInstance(Id: Int): NoteBottomFragment{
             var args = Bundle()
             val fragment = NoteBottomFragment()
             fragment.arguments = args
+            noteId = Id
             return fragment
         }
     }
@@ -81,6 +83,12 @@ class NoteBottomFragment : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        if (noteId != -1){
+            layoutDelete.visibility = View.VISIBLE
+        }
+        else {
+            layoutDelete.visibility = View.GONE
+        }
         if(selectedColor == "#606570") imgNoteDefault.setImageResource(R.drawable.ic_tick)
         setListener()
     }
@@ -219,6 +227,11 @@ class NoteBottomFragment : BottomSheetDialogFragment() {
         layoutWebUrl.setOnClickListener{
             val intent = Intent("bottom_action")
             intent.putExtra("actionNote", "WebUrl")
+            LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(intent)
+        }
+        layoutDelete.setOnClickListener{
+            val intent = Intent("bottom_action")
+            intent.putExtra("actionNote", "DeleteNote")
             LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(intent)
         }
     }
