@@ -73,13 +73,11 @@ class HomeFragment : BaseFragment() {
             override fun onQueryTextChange(p0: String?): Boolean {
 
                 var search_notes_array = ArrayList<Notes>()
-
                 for (note in NotesArray){
-                    if (note.title!!.toLowerCase(Locale.getDefault()).contains(p0.toString())){
+                    if (note.title!!.toLowerCase(Locale.getDefault()).contains(p0.toString().toLowerCase())){
                         search_notes_array.add(note)
                     }
                 }
-
                 notesAdapter.setData(search_notes_array)
                 notesAdapter.notifyDataSetChanged()
                 return true

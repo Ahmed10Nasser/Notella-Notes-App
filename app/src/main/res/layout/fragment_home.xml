@@ -33,40 +33,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/SearchBar" />
 
-    <LinearLayout
-        android:id="@+id/layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorOnSurface"
-        android:orientation="horizontal"
-        android:padding="@dimen/_10sdp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_tick"
-            app:tint="@color/ColorWhite" />
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/_10sdp"
-            android:layout_marginEnd="@dimen/_10sdp"
-            android:src="@drawable/ic_image"
-            app:tint="@color/ColorWhite" />
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:foregroundTint="@color/ColorWhite"
-            android:src="@drawable/ic_link"
-            app:tint="@color/ColorWhite" />
-
-
-    </LinearLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/CreateNoteBtn"
@@ -75,7 +41,7 @@
         android:layout_marginEnd="@dimen/_20sdp"
         android:layout_marginBottom="@dimen/_20sdp"
         android:src="@drawable/ic_add"
-        app:tint="@color/colorOnSurface"
+        app:tint="@color/ColorWhite"
         app:backgroundTint="@color/colorAccent"
         app:borderWidth="0dp"
         app:fabSize="normal"

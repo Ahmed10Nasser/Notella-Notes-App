@@ -9,7 +9,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -82,6 +81,8 @@ class NoteBottomFragment : BottomSheetDialogFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
+        // if note is still being created don't show delete option, if note is being updated shoe delete option
         super.onViewCreated(view, savedInstanceState)
         if (noteId != -1){
             layoutDelete.visibility = View.VISIBLE
@@ -89,12 +90,13 @@ class NoteBottomFragment : BottomSheetDialogFragment() {
         else {
             layoutDelete.visibility = View.GONE
         }
-        if(selectedColor == "#606570") imgNoteDefault.setImageResource(R.drawable.ic_tick)
+        if(selectedColor == "#606570"){imgNoteDefault.setImageResource(R.drawable.ic_tick)}
         setListener()
     }
 
 
 
+    //send Broadcast on events (color selection, Image selection, Web Link addition, Delete note)
     @SuppressLint("ResourceType")
     private fun setListener(){
         Note1.setOnClickListener{
@@ -224,9 +226,9 @@ class NoteBottomFragment : BottomSheetDialogFragment() {
             LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(intent)
         }
 
-        layoutWebUrl.setOnClickListener{
+        layoutWebLink.setOnClickListener{
             val intent = Intent("bottom_action")
-            intent.putExtra("actionNote", "WebUrl")
+            intent.putExtra("actionNote", "WebLink")
             LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(intent)
         }
         layoutDelete.setOnClickListener{
