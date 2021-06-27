@@ -1,26 +1,24 @@
 package com.example.notella
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Patterns
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.net.toFile
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentTransaction
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.notella.database.NotesDatabase
 import com.example.notella.entities.Notes
@@ -28,19 +26,15 @@ import com.example.notella.util.NoteBottomFragment
 import kotlinx.android.synthetic.main.fragment_create_note.*
 import kotlinx.android.synthetic.main.fragment_create_note.DateTime
 import kotlinx.android.synthetic.main.fragment_create_note.NoteText
-import kotlinx.android.synthetic.main.fragment_note_bottom.*
-import kotlinx.android.synthetic.main.notes_item.*
-import kotlinx.android.synthetic.main.notes_item.view.*
 import kotlinx.coroutines.launch
 import pub.devrel.easypermissions.AppSettingsDialog
 import pub.devrel.easypermissions.EasyPermissions
-import java.net.URI
 import java.text.SimpleDateFormat
 import java.util.*
 
 
 class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, EasyPermissions.RationaleCallbacks {
-
+    //initial variables
     var selectedColor = "#ff363636"
     var currentDate: String? = null
     private var READ_STORAGE_PERMISSION = 123
@@ -48,6 +42,7 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
     private var selectedImgUri = ""
     private var link = ""
     private var noteId = -1
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,7 +53,6 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_create_note, container, false)
     }
 
@@ -75,20 +69,20 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-
+        // If note is being updated
         if (noteId != -1){
 
             launch {
                 context?.let {
-                    var notes = NotesDatabase.getDatabase(it).noteDao().getSpecificNote(noteId)
-                    colorView.setBackgroundColor(Color.parseColor(notes.color))
-                    NoteTitle.setText(notes.title)
-                    NoteSubTitle.setText(notes.sub_title)
-                    NoteText.setText(notes.text)
-                    if (notes.imgUri != ""){
-                        selectedImgUri=notes.imgUri!!
-                        imgNote.setImageBitmap(BitmapFactory.decodeFile(notes.imgUri))
+                    var note = NotesDatabase.getDatabase(it).noteDao().getNote(noteId)
+                    selectedColor = note.color!!
+                    colorView.setBackgroundColor(Color.parseColor(note.color))
+                    NoteTitle.setText(note.title)
+                    NoteText.setText(note.text)
+                    if (note.imgUri != ""){
+                        selectedImgUri= note.imgUri.toString()
+                        val imgUri= Uri.parse(note.imgUri)!!
+                        imgNote.setImageURI(imgUri)
                         imgNote.visibility = View.VISIBLE
                         imgDelete.visibility = View.VISIBLE
                         layoutInsertImage.visibility=View.VISIBLE
@@ -99,12 +93,12 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
                     }
 
 
-                    if (notes.link != ""){
-                        link=notes.link!!
-                        tvWebLink.text = notes.link
+                    if (note.link != ""){
+                        link=note.link!!
+                        WebLink.text = note.link
                         layoutInsertWebUrl.visibility=View.VISIBLE
                         imgUrlDelete.visibility=View.VISIBLE
-                        etWebLink.setText(notes.link)
+                        WebLinkText.setText(note.link)
                     }else{
                         imgUrlDelete.visibility=View.GONE
                         layoutInsertWebUrl.visibility=View.GONE
@@ -113,13 +107,17 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
             }
         }
 
-        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(BroadcastReceiver, IntentFilter("bottom_action"))
-        colorView.setBackgroundColor(Color.parseColor(selectedColor))
 
-        val sdf = SimpleDateFormat("dd/M/yyyy hh:mm:ss")
-        currentDate = sdf.format(Date())
+
+        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(BroadcastReceiver, IntentFilter("bottom_action"))
+
+        // Add initial color and current date
+        colorView.setBackgroundColor(Color.parseColor(selectedColor))
+        val now = SimpleDateFormat("dd/M/yyyy hh:mm:ss")
+        currentDate = now.format(Date())
         DateTime.text = currentDate
 
+        // save created note or update current note (based on Id)
         imgDone.setOnClickListener {
             if (noteId != -1){
                 updateNote()
@@ -128,33 +126,37 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
             }
         }
 
+        // Go to Home
         imgBack.setOnClickListener {
             requireActivity().supportFragmentManager.popBackStack()
         }
 
+        // Shoe note options menu
         imgMore.setOnClickListener {
-            var noteBottomFragment = NoteBottomFragment.newInstance()
+            var noteBottomFragment = NoteBottomFragment.newInstance(noteId)
             noteBottomFragment.show(requireActivity().supportFragmentManager, "Note Bottom Fragment")
 
         }
 
+        // Delete Image
         imgDelete.setOnClickListener {
             selectedImgUri = ""
             layoutInsertImage.visibility = View.GONE
-
         }
 
-        btnOk.setOnClickListener {
-            if (etWebLink.text.toString().trim().isNotEmpty()){
-                checkWebUrl()
+        // Add Web Link
+        LinkOkBtn.setOnClickListener {
+            if (WebLinkText.text.toString().trim().isNotEmpty()){
+                ValidateUrl()
             }else{
                 Toast.makeText(requireContext(),"Url is Required",Toast.LENGTH_SHORT).show()
             }
         }
 
-        btnCancel.setOnClickListener {
+        //Cancel Web Link
+        LinkCancelBtn.setOnClickListener {
             if (noteId != -1){
-                tvWebLink.visibility = View.VISIBLE
+                WebLink.visibility = View.VISIBLE
                 layoutInsertWebUrl.visibility = View.GONE
             }else{
                 layoutInsertWebUrl.visibility = View.GONE
@@ -162,94 +164,110 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
 
         }
 
+        //Delete Web LInk
         imgUrlDelete.setOnClickListener {
             link = ""
-            tvWebLink.visibility = View.GONE
+            WebLink.visibility = View.GONE
             imgUrlDelete.visibility = View.GONE
             layoutInsertWebUrl.visibility = View.GONE
         }
 
-        tvWebLink.setOnClickListener {
-            var intent = Intent(Intent.ACTION_VIEW,Uri.parse(etWebLink.text.toString()))
+        //Follow Web Link
+        WebLink.setOnClickListener {
+            var intent = Intent(Intent.ACTION_VIEW,Uri.parse(WebLinkText.text.toString()))
             startActivity(intent)
         }
     }
 
-
-
-    private fun updateNote(){
-        launch {
-
-            context?.let {
-                var notes = NotesDatabase.getDatabase(it).noteDao().getSpecificNote(noteId)
-
-                notes.title = NoteTitle.text.toString()
-                notes.sub_title = NoteSubTitle.text.toString()
-                notes.text = NoteText.text.toString()
-                notes.dateTime = currentDate
-                notes.color = selectedColor
-                notes.imgUri = selectedImgUri
-                notes.link = link
-
-                NotesDatabase.getDatabase(it).noteDao().updateNote(notes)
-                NoteTitle.setText("")
-                NoteSubTitle.setText("")
-                NoteText.setText("")
-                layoutInsertImage.visibility = View.GONE
-                imgNote.visibility = View.GONE
-                tvWebLink.visibility = View.GONE
-                requireActivity().supportFragmentManager.popBackStack()
-            }
-        }
-    }
-
+    //function to save a note
     private fun saveNote() {
         if (NoteTitle.text.isNullOrEmpty()) {
             Toast.makeText(context, "Note Title is Required", Toast.LENGTH_SHORT).show()
         }
-        else if (NoteSubTitle.text.isNullOrEmpty()) {
-            Toast.makeText(context, "Note Sub Title is Required", Toast.LENGTH_SHORT).show()
-        }
-        else if (NoteText.text.isNullOrEmpty()) {
-            Toast.makeText(context, "Note Text is Required", Toast.LENGTH_SHORT).show()
-        }
         else {
 
             launch {
-                val notes = Notes()
-                notes.title = NoteTitle.text.toString()
-                notes.sub_title = NoteSubTitle.text.toString()
-                notes.text = NoteText.text.toString()
-                notes.dateTime = currentDate
-                notes.color = selectedColor
-                notes.imgUri = selectedImgUri
-                notes.link=link
+                val note = Notes()
+                note.title = NoteTitle.text.toString()
+                note.text = NoteText.text.toString()
+                note.dateTime = currentDate
+                note.color = selectedColor
+                note.imgUri = selectedImgUri
+                note.link=link
                 context?.let {
-                    NotesDatabase.getDatabase(it).noteDao().insert(notes)
+                    NotesDatabase.getDatabase(it).noteDao().insertNote(note)
                     NoteText.setText("")
                     NoteTitle.setText("")
-                    NoteSubTitle.setText("")
                     layoutInsertImage.visibility = View.GONE
                     imgNote.visibility = View.GONE
-                    tvWebLink.visibility=View.GONE
+                    WebLink.visibility=View.GONE
                     requireActivity().supportFragmentManager.popBackStack()
                 }
             }
         }
     }
 
-    private fun checkWebUrl(){
-        if (Patterns.WEB_URL.matcher(etWebLink.text.toString()).matches()){
+    //function to update a note
+    private fun updateNote(){
+        launch {
+
+            context?.let {
+                var note = NotesDatabase.getDatabase(it).noteDao().getNote(noteId)
+
+                note.title = NoteTitle.text.toString()
+                note.text = NoteText.text.toString()
+                note.dateTime = currentDate
+                note.color = selectedColor
+                note.imgUri = selectedImgUri
+                note.link = link
+
+                NotesDatabase.getDatabase(it).noteDao().updateNote(note)
+                NoteTitle.setText("")
+                NoteText.setText("")
+                layoutInsertImage.visibility = View.GONE
+                imgNote.visibility = View.GONE
+                WebLink.visibility = View.GONE
+                requireActivity().supportFragmentManager.popBackStack()
+            }
+        }
+    }
+
+    private fun discardBottomFragment(){
+        val manager: FragmentManager = requireActivity().supportFragmentManager
+        val f: Fragment? = manager.findFragmentByTag("Note Bottom Fragment")
+        val trans: FragmentTransaction = manager.beginTransaction()
+        if (f != null) {
+            trans.remove(f)
+        }
+        trans.commit()
+    }
+
+    //function to delete a note
+    private fun deleteNote(){
+
+        launch {
+            context?.let {
+                NotesDatabase.getDatabase(it).noteDao().deleteNote(noteId)
+                discardBottomFragment()
+                requireActivity().supportFragmentManager.popBackStack()
+            }
+        }
+    }
+
+    //function to validate link pattern
+    private fun ValidateUrl(){
+        if (Patterns.WEB_URL.matcher(WebLinkText.text.toString()).matches()){
             layoutInsertWebUrl.visibility = View.GONE
-            etWebLink.isEnabled = false
-            link = etWebLink.text.toString()
-            tvWebLink.visibility = View.VISIBLE
-            tvWebLink.text = etWebLink.text.toString()
+            WebLinkText.isEnabled = false
+            link = WebLinkText.text.toString()
+            WebLink.visibility = View.VISIBLE
+            WebLink.text = WebLinkText.text.toString()
         }else{
             Toast.makeText(requireContext(),"Url is not valid",Toast.LENGTH_SHORT).show()
         }
     }
 
+    // BroadcastReceiver for actions from note bottom fragment ( color selection, Image selection, Web Link addition, Delete note)
     private val BroadcastReceiver : BroadcastReceiver = object : BroadcastReceiver(){
         override fun onReceive(context: Context?, intent: Intent?) {
             var actionNote = intent!!.getStringExtra("actionNote")!!
@@ -263,8 +281,12 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
                     readStorageTask()
                     layoutInsertWebUrl.visibility=View.GONE
                 }
-                "WebUrl"->{
+                "WebLink"->{
                     layoutInsertWebUrl.visibility=View.VISIBLE
+                    discardBottomFragment()
+                }
+                "DeleteNote" -> {
+                    deleteNote()
                 }
                 else -> {
                     layoutInsertImage.visibility = View.GONE
@@ -279,10 +301,7 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
 
     }
 
-    override fun onDestroy() {
-        LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(BroadcastReceiver)
-        super.onDestroy()
-    }
+    // Get permission to access storage to get an image
 
     private fun hasReadStoragePermission():Boolean{
         return EasyPermissions.hasPermissions(requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -309,16 +328,10 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
         }
     }
 
-    override fun onRequestPermissionsResult(
-            requestCode: Int,
-            permissions: Array<out String>,
-            grantResults: IntArray
-    ) {
+    override fun onRequestPermissionsResult( requestCode: Int, permissions: Array<out String>, grantResults: IntArray ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
         EasyPermissions.onRequestPermissionsResult(requestCode,permissions,grantResults,requireActivity())
     }
-
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -327,9 +340,7 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
                 var selectedImageUrl = data.data
                 if (selectedImageUrl != null){
                     try {
-                        var inputStream = requireActivity().contentResolver.openInputStream(selectedImageUrl)
-                        var bitmap = BitmapFactory.decodeStream(inputStream)
-                        imgNote.setImageBitmap(bitmap)
+                        imgNote.setImageURI(selectedImageUrl)
                         imgNote.visibility = View.VISIBLE
                         layoutInsertImage.visibility = View.VISIBLE
                         selectedImgUri = selectedImageUrl.toString()
@@ -342,7 +353,6 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
             }
         }
     }
-
 
     override fun onPermissionsGranted(requestCode: Int, perms: MutableList<String>) {
         Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show()
@@ -358,6 +368,11 @@ class CreateFragment : BaseFragment(), EasyPermissions.PermissionCallbacks, Easy
     }
 
     override fun onRationaleDenied(requestCode: Int) {
+    }
+
+    override fun onDestroy() {
+        LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(BroadcastReceiver)
+        super.onDestroy()
     }
 
 }

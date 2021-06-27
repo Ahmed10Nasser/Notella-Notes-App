@@ -9,14 +9,13 @@ interface NotesDao {
     suspend fun getAll(): List<Notes>
 
     @Query("SELECT * FROM notes WHERE id =:id")
-    suspend fun getSpecificNote(id:Int) : Notes
+    suspend fun getNote(id:Int) : Notes
+
+    @Query("DELETE FROM notes WHERE id =:id")
+    suspend fun deleteNote(id:Int)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(note: Notes)
-
-
-    @Delete
-    suspend fun delete(note: Notes)
+    suspend fun insertNote(note: Notes)
 
     @Update
     suspend fun updateNote(note:Notes)
