@@ -38,7 +38,10 @@ class NotesAdapter() : RecyclerView.Adapter<NotesAdapter.NotesViewHolder>() {
         //view note color
         if(notesList[position].color != null){
             holder.itemView.cardView.setCardBackgroundColor(Color.parseColor(notesList[position].color))
-            //light text color for darker notes
+            holder.itemView.Title.setTextColor(Color.parseColor("#ffffff"))
+            holder.itemView.NoteText.setTextColor(Color.parseColor("#ffffff"))
+            holder.itemView.DateTime.setTextColor(Color.parseColor("#ffffff"))
+            //darker text color for lighter notes
             if (notesList[position].color !="#ff606570" && notesList[position].color != "#ff363636" ){
                 holder.itemView.Title.setTextColor(Color.parseColor("#10141C"))
                 holder.itemView.NoteText.setTextColor(Color.parseColor("#171C26"))
@@ -77,8 +80,8 @@ class NotesAdapter() : RecyclerView.Adapter<NotesAdapter.NotesViewHolder>() {
         return notesList.size
     }
 
-    fun setData(arrNotesList: List<Notes>){
-        notesList = arrNotesList as ArrayList<Notes>
+    fun setData(NotesList: List<Notes>){
+        notesList = NotesList as ArrayList<Notes>
     }
 
     interface OnItemClickListener{

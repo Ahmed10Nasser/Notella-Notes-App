@@ -80,6 +80,7 @@ class HomeFragment : BaseFragment() {
         // search for notes with text in search bar in the title (letter case irrelevant)
         SearchBar.setOnQueryTextListener( object : SearchView.OnQueryTextListener{
             override fun onQueryTextSubmit(p0: String?): Boolean {
+                notesAdapter.notifyDataSetChanged()
                 return true
             }
 
